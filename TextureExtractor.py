@@ -21,17 +21,18 @@ class OBJECT_OT_StartTextureBakeOperator(bpy.types.Operator):
     bl_label = "Start Texture Bake Process"
     
     def execute(self, context):
-        addon_prefs = bpy.context.preferences.addons[__name__].preferences
-        resolution = addon_prefs.resolution
-        inflation = addon_prefs.inflation
-#        resolution = 256
-#        inflation = .05
+       addon_prefs = bpy.context.preferences.addons[__name__].preferences
+       resolution = addon_prefs.resolution
+       inflation = addon_prefs.inflation
+        # resolution = 256
+        # inflation = .005
 
         source_object = bpy.context.active_object
         object_name = source_object.name.replace(".", "_")  # Replace periods with underscores
         self.new_object = self.create_duplicate_object(context, object_name)
         self.apply_scale(self.new_object)
-        #self.prepare_object(self.new_object) #Method used for optional changes like setting normals to outside, and shading smooth
+        self.remove_doubles(self.new_object)
+#        self.prepare_object(self.new_object) #Method used for optional changes like setting normals to outside, and shading smooth
         self.perform_smart_uv_project(self.new_object)
         self.set_origin_to_geometry(self.new_object)
         self.remove_all_materials(self.new_object)
@@ -89,6 +90,7 @@ class OBJECT_OT_StartTextureBakeOperator(bpy.types.Operator):
             print(f"Created 'Texture Output' folder in {os.path.dirname(blend_file_path)}")
     
     def bake_textures(self, source_object, target_object, cage_object):
+        bpy.context.scene.render.bake.use_selected_to_active = True
         bpy.context.scene.render.engine = 'CYCLES'
         bpy.context.scene.cycles.bake_type = 'DIFFUSE'
         bpy.context.scene.render.bake.use_pass_direct = False
@@ -134,11 +136,15 @@ class OBJECT_OT_StartTextureBakeOperator(bpy.types.Operator):
         new_object.select_set(True)
         return new_object
 
+    def remove_doubles(self, obj):
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.remove_doubles()
+        bpy.ops.object.mode_set(mode='OBJECT')
 
     def prepare_object(self, obj):
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.remove_doubles()
         bpy.ops.mesh.normals_make_consistent(inside=False)
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.data.use_auto_smooth = False
