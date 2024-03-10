@@ -21,9 +21,9 @@ class OBJECT_OT_StartTextureBakeOperator(bpy.types.Operator):
     bl_label = "Start Texture Bake Process"
     
     def execute(self, context):
-       addon_prefs = bpy.context.preferences.addons[__name__].preferences
-       resolution = addon_prefs.resolution
-       inflation = addon_prefs.inflation
+        addon_prefs = bpy.context.preferences.addons[__name__].preferences
+        resolution = addon_prefs.resolution
+        inflation = addon_prefs.inflation
         # resolution = 256
         # inflation = .005
 
