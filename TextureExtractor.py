@@ -103,6 +103,7 @@ class OBJECT_OT_StartTextureBakeOperator(bpy.types.Operator):
 
         bpy.context.view_layer.objects.active = target_object
         
+        bpy.context.scene.render.bake.use_cage = True
         bpy.context.scene.render.bake.cage_object = bpy.data.objects[cage_object.name]
         
         bpy.ops.object.bake(type='DIFFUSE')
